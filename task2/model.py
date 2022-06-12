@@ -15,7 +15,7 @@ class CNN(nn.Module):
         # fs: 每次滑动窗口计算用到几个单词 相当于 n-gram 中的 n 
         # for fs in filter_sizes 用好几个卷积模型 最后 concate 起来看效果
         self.convs = nn.ModuleList([
-            nn.conv2d(in_channels=1,out_channels=num_filter,
+            nn.Conv2d(in_channels=1,out_channels=num_filter,
             kernel_size=(fs,embedding_dim))
             for fs in filter_sizes
         ])
@@ -25,7 +25,7 @@ class CNN(nn.Module):
 
     def forward(self,text):
         embedded = self.dropout(self.embedding(text)) # [batch size, sentence len, emb dim]
-        embedded = embedded.unsequeeze(1)   # [batch size, 1, sentence len, emb dim]
+        embedded = embedded.unsqueeze(1)   # [batch size, 1, sentence len, emb dim]
         # 升维 为了和 nn.conv2d 的输入维度吻合 把 channel 列升维
         conved = [F.relu(conv(embedded)).squeeze(3) for conv in self.convs]
         # conved = [batch sizez, num_filter, sentence len - fileter_sizes + 1]
